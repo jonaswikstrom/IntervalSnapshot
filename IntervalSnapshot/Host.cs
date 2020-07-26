@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace IntervalSnapshot
 {
@@ -11,12 +12,16 @@ namespace IntervalSnapshot
         private readonly ILogger<Host> logger;
         private readonly ITimer timer;
         private readonly IFileHandler fileHandler;
+        private readonly IOptions<Settings> settings;
 
-        public Host(ILogger<Host> logger, ITimer timer, ISnapshotProvider snapshotProvider, IFileHandler fileHandler)
+        public Host(ILogger<Host> logger, ITimer timer, 
+            ISnapshotProvider snapshotProvider, 
+            IFileHandler fileHandler, IOptions<Settings> settings)
         {
             this.logger = logger;
             this.timer = timer;
             this.fileHandler = fileHandler;
+            this.settings = settings;
 
             timer.OnElapsed(async () =>
             {
@@ -29,9 +34,14 @@ namespace IntervalSnapshot
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation("Starting host");
             timer.Start();
-            
+
+            logger.LogInformation("Host started");
+            logger.LogInformation($"Interval: {settings.Value.Interval.TotalMilliseconds} ms");
+            logger.LogInformation($"Snapshot url: {settings.Value.SnapshotUrl}");
+            logger.LogInformation($"Root directory: {settings.Value.RootDirectory}");
+            logger.LogInformation($"Image file name: {settings.Value.ImageFileName}");
+
             return Task.CompletedTask;
         }
 

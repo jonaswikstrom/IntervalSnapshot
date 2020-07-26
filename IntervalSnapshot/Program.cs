@@ -29,7 +29,7 @@ namespace IntervalSnapshot
 
             });
 
-            Console.WriteLine("Starting host for IntervalSnapshot");
+            Console.WriteLine("Starting IntervalSnapshot");
             await hostBuilder.RunConsoleAsync();
         }
     }
